@@ -1,6 +1,6 @@
 {
-  "short_name": "TKM",
-  "name": "Task Manager",
+  "short_name": "Behzad News",
+  "name": "Behzad News",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,7 +10,8 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "maskable any"
     },
     {
       "src": "logo512.png",
