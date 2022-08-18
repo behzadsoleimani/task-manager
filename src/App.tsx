@@ -1,12 +1,20 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from "./pages/Home";
+import "./App.css"
+import { Fragment } from 'react';
+import Header from './components/Header';
+import Test from './pages/Test';
+
 
 export default () => (
-  <div style={{
-    display: "flex",
-    justifyContent: "center",
-    height: "100vh",
-    alignItems: "center"
-  }}>
-    Hello world
-  </div>
+  <Fragment>
+    <BrowserRouter>
+      <Header />
+      <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/test" element={<Test />} />
+      </Routes>
+    </BrowserRouter>
+  </Fragment>
 )
