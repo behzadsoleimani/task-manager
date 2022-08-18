@@ -61,7 +61,7 @@ const Header = () => {
                         🤹‍
           </span>
                 </HomeLinkEmoji>
-                <HomeLinkText>Bdrop</HomeLinkText>
+                <HomeLinkText>BDrop</HomeLinkText>
             </HomeLink>
             <GithubLink href="https://github.com/behzadsoleimani/task-manager" target="_blank">
                 <FaGithub size={20} />
