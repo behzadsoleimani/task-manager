@@ -166,7 +166,7 @@ const Home = () => {
   const onGenerateExampleBoard = async () => {
     setIsLoading(true);
     dispatch(generateExampleBoard())
-    setIsLoading(true);
+    setIsLoading(false);
   };
 
   return (
