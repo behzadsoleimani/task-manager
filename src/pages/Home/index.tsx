@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FaTimesCircle } from 'react-icons/fa';
 import Button from '../../components/Button';
-import { addBoard } from '../../redux/board';
+import { addBoard, deleteBoard, generateExampleBoard } from '../../redux/board';
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 
 const StyledHome = styled.div`
@@ -128,70 +128,76 @@ const StyledDeleteBoardButton = styled.button`
 `;
 
 const Home = () => {
-    const [newBoardTitle, setNewBoardTitle] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const dispatch = useAppDispatch();
-    const boards = useAppSelector(state => state.boards.value);
+  const [newBoardTitle, setNewBoardTitle] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const boards = useAppSelector(state => state.boards.value);
 
-    const handleTitleChange = (event: any) => setNewBoardTitle(event.target.value);
+  const handleTitleChange = (event: any) => setNewBoardTitle(event.target.value);
 
-    const handleAddBoard = (event: any, boardTitle: string) => {
-        event.preventDefault();
-        onAddBoard(boardTitle);
-    };
+  const handleAddBoard = ( boardTitle: string) => (event: any) => {
+    event.preventDefault();
+    onAddBoard(boardTitle);
+  };
 
-    const handleDeleteBoard = (event: any, boardId: any) => {
-        event.preventDefault();
-        onDeleteBoard(boardId);
-    };
+  const handleDeleteBoard = (boardId: number) => (event: any) => {
+    event.preventDefault();
+    onDeleteBoard(boardId);
+  };
 
-    const handleGenerateExampleBoard = (event: any) => {
-        event.preventDefault();
-        onGenerateExampleBoard();
-    };
+  const handleGenerateExampleBoard = (event: any) => {
+    event.preventDefault();
+    onGenerateExampleBoard();
+  };
 
-    const onAddBoard = async (boardTitle: string) => {
-        setIsLoading(true);
-        dispatch(addBoard({ title: boardTitle, id: new Date().getTime() }))
-        setIsLoading(false);
-    };
+  const onAddBoard = async (boardTitle: string) => {
+    setIsLoading(true);
+    dispatch(addBoard({ title: boardTitle, id: new Date().getTime() }));
+    setNewBoardTitle('')
+    setIsLoading(false);
+  };
 
-    const onDeleteBoard = async (boardId: any) => {
-        setIsLoading(true);
-    };
+  const onDeleteBoard = async (boardId: number) => {
+    setIsLoading(true);
+    dispatch(deleteBoard(boardId))
+    setIsLoading(false);
+  };
 
-    const onGenerateExampleBoard = async () => {
-        setIsLoading(true);
-    };
+  const onGenerateExampleBoard = async () => {
+    setIsLoading(true);
+    dispatch(generateExampleBoard())
+    setIsLoading(true);
+  };
 
-    return (
-        <StyledHome>
-            <HomeTitle>Pick a board...</HomeTitle>
-            <List>
-                {boards.map((board: any) => (
-                    <Row key={`row-${board.id}`}>
-                        <StyledLink to={`board/${board.id}`}>{board.title}</StyledLink>
-                        <StyledDeleteBoardButton onClick={(event: any) => handleDeleteBoard(event, board.id)}>
-                            <FaTimesCircle size={18} />
-                        </StyledDeleteBoardButton>
-                    </Row>
-                ))}
-                <StyledForm onSubmit={(e) => handleAddBoard(e, newBoardTitle)}>
-                    <FormRow>
-                        <StyledInput value={newBoardTitle} onChange={(e) => handleTitleChange(e)} placeholder="Add a new board" />
-                        <Button variant="board" type="submit" value="Submit" text="Add" disabled={!newBoardTitle || isLoading} />
-                    </FormRow>
-                    <StyledOr>or</StyledOr>
-                    <Button
-                        variant="example"
-                        text="Generate Example Board"
-                        onClick={(e: any) => handleGenerateExampleBoard(e)}
-                        disabled={isLoading}
-                    />
-                </StyledForm>
-            </List>
-        </StyledHome>
-    );
+  return (
+    <StyledHome>
+      <HomeTitle>Pick a board...</HomeTitle>
+      <List>
+        {boards.map((board: any) => (
+          <Row key={`row-${board.id}`}>
+            <StyledLink to={`board/${board.id}`}>{board.title}</StyledLink>
+            <StyledDeleteBoardButton onClick={handleDeleteBoard(board.id)}>
+              <FaTimesCircle size={18} />
+            </StyledDeleteBoardButton>
+          </Row>
+        ))}
+        <StyledForm onSubmit={handleAddBoard(newBoardTitle)}>
+          <FormRow>
+            <StyledInput value={newBoardTitle} onChange={handleTitleChange} placeholder="Add a new board" />
+            <Button variant="board" type="submit" value="Submit" text="Add" disabled={!newBoardTitle || isLoading}
+            data-testid="addButton" />
+          </FormRow>
+          <StyledOr>or</StyledOr>
+          <Button
+            variant="example"
+            text="Generate Example Board"
+            onClick={handleGenerateExampleBoard}
+            disabled={isLoading}
+          />
+        </StyledForm>
+      </List>
+    </StyledHome>
+  );
 };
 
 
