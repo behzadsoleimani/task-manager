@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom"
 import List from '../../components/List';
 import ListAdder from '../../components/ListAdder';
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { addList } from '../../redux/board';
+import { addList , reorderBoard , reorderList } from '../../redux/board';
 
 const StyledBoard = styled.div`
   display: flex;
@@ -71,6 +71,7 @@ const Board = () => {
      
 
     const handleDragEnd = ({ draggableId, source, destination, type }: any) => {
+
         if (!destination) {
             return;
         }
@@ -80,26 +81,25 @@ const Board = () => {
         }
 
         if (type === 'COLUMN') {
-            //   dispatch(
-            //     reorderBoard({
-            //       listId: draggableId,
-            //       sourceId: source.droppableId,
-            //       sourceIndex: source.index,
-            //       destinationIndex: destination.index
-            //     })
-            //   );
+              dispatch(
+                reorderBoard({
+                  dropListId: draggableId,
+                  destinationIndex: destination.index,
+                  boardId
+                })
+              );
             return;
         } else {
-            //   dispatch(
-            //     reorderList({
-            //       cardId: draggableId,
-            //       sourceId: source.droppableId,
-            //       destinationId: destination.droppableId,
-            //       sourceIndex: source.index,
-            //       destinationIndex: destination.index,
-            //       boardId
-            //     })
-            //   );
+              dispatch(
+                reorderList({
+                  cardId: draggableId,
+                  initListId: source.droppableId,
+                  destListId: destination.droppableId,
+                //   sourceIndex: source.index,
+                  destinationIndex: destination.index,
+                  boardId
+                })
+              );
         }
     };
 
