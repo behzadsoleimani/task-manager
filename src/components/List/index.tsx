@@ -10,9 +10,9 @@ import EditCardButton from '../EditCardButton';
 import CardTextarea from '../CardTextarea';
 import ListTitleTextarea from '../ListTitleTextarea';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
-import { addCard, editListTitle } from '../../redux/board';
+import { addCard, editListTitle, deleteList, deleteCard, editCardTitle } from '../../redux/board';
+import { ICard } from '../../types/global-types';
 
-// import {addCard, editCardTitle, deleteCard, editListTitle, deleteList} from '../../actions/actionCreators';
 
 const TextareaWrapper = styled.div`
   display: flex;
@@ -85,7 +85,7 @@ const List = ({ boardId, list }: any) => {
   const [newCardFormIsOpen, setNewCardFormIsOpen] = useState(false);
   const [isListTitleInEdit, setIsListTitleInEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [cardInEdit, setCardInEdit] = useState(null);
+  const [cardInEdit, setCardInEdit] = useState("");
   const [newCardTitle, setNewCardTitle] = useState('');
   const [newListTitle, setNewListTitle] = useState('');
   const [tempCardTitle, setTempCardTitle] = useState('');
@@ -100,8 +100,8 @@ const List = ({ boardId, list }: any) => {
     setNewCardTitle(event.target.value);
   };
 
-  const handleKeyDown = (event: any, callback: any) => {
-    if (event.keyCode === 13) {
+  const handleKeyDown = (callback: any) => (event: any) => {
+    if (event.key === 'Enter') {
       callback(event);
     }
   };
@@ -113,7 +113,7 @@ const List = ({ boardId, list }: any) => {
     onSubmitCard();
   };
 
-  const openCardEditor = (event: any, card: any) => {
+  const openCardEditor = (event: any, card: ICard) => {
     event.preventDefault();
     setCardInEdit(card.id);
     setTempCardTitle(card.title);
@@ -136,7 +136,7 @@ const List = ({ boardId, list }: any) => {
     }
   };
 
-  const handleDeleteCard = (event: any, cardId: any) => {
+  const handleDeleteCard = (cardId: string) => (event: any) => {
     event.preventDefault();
     onDeleteCard(cardId);
   };
@@ -156,7 +156,7 @@ const List = ({ boardId, list }: any) => {
 
   const handleDeleteListButtonClick = (event: any) => {
     event.preventDefault();
-    onDeleteList(list.cards, list.id, boardId);
+    onDeleteList(list.id, boardId);
   };
 
   const onSubmitCard = async () => {
@@ -167,33 +167,31 @@ const List = ({ boardId, list }: any) => {
   };
 
   const onEditCard = async () => {
-    // await dispatch(
-    //   editCardTitle({
-    //     cardTitle: tempCardTitle.trim(),
-    //     cardId: cardInEdit,
-    //     cardIndex: list.cards.indexOf(cardInEdit),
-    //     listId: list.id,
-    //     boardId
-    //   })
-    // ).then(() => {
-    //   setTempCardTitle('');
-    //   setCardInEdit(null);
-    // });
+    await dispatch(
+      editCardTitle({
+        cardTitle: tempCardTitle.trim(),
+        cardId: cardInEdit,
+        listId: list.id,
+        boardId
+      })
+    )
+      setTempCardTitle('');
+      setCardInEdit('');
   };
 
   const onDeleteCard = (cardId: any) => {
-    // dispatch(deleteCard({cardId, listId: list.id, boardId}));
+    dispatch(deleteCard({ cardId, listId: list.id, boardId }));
   };
 
-  const onEditListTitle = async (listTitle: any, listId: any, boardId: any) => {
+  const onEditListTitle = async (listTitle: string, listId: string, boardId: string) => {
     setIsListTitleInEdit(true);
-    await dispatch(editListTitle({listTitle, listId, boardId}))
-      setNewListTitle('');
-      setIsListTitleInEdit(false);
+    await dispatch(editListTitle({ listTitle, listId, boardId }))
+    setNewListTitle('');
+    setIsListTitleInEdit(false);
   };
 
-  const onDeleteList = (cards: any, listId: any, boardId: any) => {
-    // dispatch(deleteList({cards, listId, boardId}));
+  const onDeleteList = (listId: string, boardId: string) => {
+    dispatch(deleteList({ listId, boardId }));
   };
 
 
@@ -204,7 +202,7 @@ const List = ({ boardId, list }: any) => {
           <ListTitleTextarea
             value={newListTitle}
             onChange={handleListTitleEditorChange}
-            onKeyDown={(e: any) => handleKeyDown(e, handleSubmitListTitle)}
+            onKeyDown={handleKeyDown(handleSubmitListTitle)}
             onBlur={handleSubmitListTitle}
           />
         </ListTitleTextareaWrapper>
@@ -230,7 +228,7 @@ const List = ({ boardId, list }: any) => {
                         data-react-beautiful-dnd-drag-handle="0">
                         {card.title}
                         <ButtonWrapper>
-                          <DeleteCardButton onClick={(e: any) => handleDeleteCard(e, card.id)} />
+                          <DeleteCardButton onClick={handleDeleteCard(card.id)} />
                           <EditCardButton onClick={(e: any) => openCardEditor(e, card)} />
                         </ButtonWrapper>
                       </CardTitle>
@@ -239,7 +237,7 @@ const List = ({ boardId, list }: any) => {
                         <CardTextarea
                           value={tempCardTitle}
                           onChange={handleCardEditorChange}
-                          onKeyDown={(e: any) => handleKeyDown(e, handleCardEdit)}
+                          onKeyDown={handleKeyDown(handleCardEdit)}
                           onBlur={handleCardEdit}
                         />
                       </TextareaWrapper>
@@ -255,7 +253,7 @@ const List = ({ boardId, list }: any) => {
                 <CardTextarea
                   value={newCardTitle}
                   onChange={handleCardComposerChange}
-                  onKeyDown={(e: any) => handleKeyDown(e, handleSubmitCard)}
+                  onKeyDown={handleKeyDown(handleSubmitCard)}
                   onBlur={handleSubmitCard}
                 />
                 <Button variant="add" onClick={handleSubmitCard} text="Add" disabled={newCardTitle === ''} />
