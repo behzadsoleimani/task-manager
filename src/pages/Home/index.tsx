@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FaTimesCircle } from 'react-icons/fa';
@@ -131,16 +131,17 @@ const Home = () => {
   const [newBoardTitle, setNewBoardTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
-  const boards = useAppSelector(state => state.boards.value);
+  const boards = useAppSelector(state => state.boards);
+
 
   const handleTitleChange = (event: any) => setNewBoardTitle(event.target.value);
 
-  const handleAddBoard = ( boardTitle: string) => (event: any) => {
+  const handleAddBoard = (boardTitle: string) => (event: any) => {
     event.preventDefault();
     onAddBoard(boardTitle);
   };
 
-  const handleDeleteBoard = (boardId: number) => (event: any) => {
+  const handleDeleteBoard = (boardId: string) => (event: any) => {
     event.preventDefault();
     onDeleteBoard(boardId);
   };
@@ -152,12 +153,12 @@ const Home = () => {
 
   const onAddBoard = async (boardTitle: string) => {
     setIsLoading(true);
-    dispatch(addBoard({ title: boardTitle, id: new Date().getTime() }));
+    dispatch(addBoard({ title: boardTitle, id: `${new Date().getTime()}` }));
     setNewBoardTitle('')
     setIsLoading(false);
   };
 
-  const onDeleteBoard = async (boardId: number) => {
+  const onDeleteBoard = async (boardId: string) => {
     setIsLoading(true);
     dispatch(deleteBoard(boardId))
     setIsLoading(false);
@@ -168,6 +169,8 @@ const Home = () => {
     dispatch(generateExampleBoard())
     setIsLoading(false);
   };
+
+
 
   return (
     <StyledHome>
@@ -185,7 +188,7 @@ const Home = () => {
           <FormRow>
             <StyledInput value={newBoardTitle} onChange={handleTitleChange} placeholder="Add a new board" />
             <Button variant="board" type="submit" value="Submit" text="Add" disabled={!newBoardTitle || isLoading}
-            data-testid="addButton" />
+              data-testid="addButton" />
           </FormRow>
           <StyledOr>or</StyledOr>
           <Button
