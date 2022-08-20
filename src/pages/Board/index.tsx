@@ -1,11 +1,11 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useLocation } from "react-router-dom"
 import List from '../../components/List';
 import ListAdder from '../../components/ListAdder';
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { addList, getInit } from '../../redux/board';
+import { addList } from '../../redux/board';
 
 const StyledBoard = styled.div`
   display: flex;
@@ -58,12 +58,7 @@ const ListsWrapper = styled.div`
 `;
 
 const Board = () => {
-    useEffect(() => {
-        if(!localStorage.getItem("boards")) return;
-        else{
-          dispatch(getInit())
-        }
-      }, []);
+
     const location = useLocation();
     const boardId = location.pathname.split("/")[2];
     const boards = useAppSelector(state => state.boards);
@@ -72,12 +67,6 @@ const Board = () => {
     const [newListTitle, setNewListTitle] = useState('');
     const dispatch = useAppDispatch();
 
-    useLayoutEffect(() => {
-        if(!localStorage.getItem("boards")) return;
-        else{
-          dispatch(getInit())
-        }
-      }, []);
 
      
 
@@ -127,7 +116,7 @@ const Board = () => {
     
 
     return (
-        boards && boards.length ?
+      currentBoard ?
         <React.Fragment>
             <BoardTitleWrapper>
                 <BoardTitle>{currentBoard!.title}</BoardTitle>
