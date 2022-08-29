@@ -22,6 +22,22 @@ export const boardSlice = createSlice({
       localStorage.setItem("boards", JSON.stringify(restBoards))
       return restBoards;
     },
+    editBoardTitle: (state, action) => {
+      const currentBoardIndex = state.findIndex((board: any) => board.id === action.payload.boardId);
+      const currentBoard = state[currentBoardIndex];
+      const restBoards = state.findIndex((board: any) => board.id !== action.payload.boardId);
+      
+      localStorage.setItem("boards", JSON.stringify([...state.slice(0, currentBoardIndex), {
+        id: currentBoard.id,
+        title: action.payload.boardTitle,
+        list: currentBoard.list
+      }, ...state.slice(currentBoardIndex + 1, state.length)]))
+      return [...state.slice(0, currentBoardIndex), {
+        id: currentBoard.id,
+        title: action.payload.boardTitle,
+        list: currentBoard.list
+      }, ...state.slice(currentBoardIndex + 1, state.length)];
+    },
     generateExampleBoard: (state) => {
       const title = `Example Board ${getRandomEmoji()}`;
       const exampleCards = generateExampleCards();
@@ -275,7 +291,7 @@ export const boardSlice = createSlice({
   },
 })
 
-export const { addBoard, deleteBoard, generateExampleBoard, addList,
+export const { addBoard, deleteBoard, editBoardTitle, generateExampleBoard, addList,
   addCard, editListTitle, getInit, deleteList,
   deleteCard, editCardTitle, reorderBoard, reorderList } = boardSlice.actions
 

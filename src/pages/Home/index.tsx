@@ -3,13 +3,24 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FaTimesCircle } from 'react-icons/fa';
 import Button from '../../components/Button';
-import { addBoard, deleteBoard, generateExampleBoard } from '../../redux/board';
+import EditCardButton from '../../components/EditCardButton';
+import BoardTextarea from '../../components/CardTextarea';
+import { addBoard, deleteBoard, generateExampleBoard, editBoardTitle } from '../../redux/board';
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { IBoard } from '../../types/global-types';
 
 const StyledHome = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const TextareaWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: 0 10px;
 `;
 
 const HomeTitle = styled.div`
@@ -22,6 +33,13 @@ const HomeTitle = styled.div`
   @media (max-width: 768px) {
     font-size: 1.25rem;
   }
+`;
+
+const ButtonWrapper = styled.div`
+  height: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 const StyledLink = styled(Link)`
@@ -130,6 +148,8 @@ const StyledDeleteBoardButton = styled.button`
 const Home = () => {
   const [newBoardTitle, setNewBoardTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [boardInEdit, setBoardInEdit] = useState("");
+  const [tempBoardTitle, setTempBoardTitle] = useState('');
   const dispatch = useAppDispatch();
   const boards = useAppSelector(state => state.boards);
 
@@ -164,6 +184,42 @@ const Home = () => {
     setIsLoading(false);
   };
 
+  const openBoardEditor = (event: any, board: IBoard) => {
+    event.preventDefault();
+    setBoardInEdit(board.id);
+    setTempBoardTitle(board.title);
+  };
+
+  const handleBoardEditorChange = (event: any) => {
+    setTempBoardTitle(event.target.value);
+  };
+
+  const handleBoardEdit = async (e: any) => {
+    e.preventDefault();
+    if (tempBoardTitle.length < 1) {
+      onDeleteBoard(boardInEdit);
+    } else {
+      onEditBoard();
+    }
+  };
+
+  const onEditBoard = async () => {
+    await dispatch(
+      editBoardTitle({
+        boardTitle: tempBoardTitle.trim(),
+        boardId: boardInEdit,
+      })
+    )
+      setTempBoardTitle('');
+      setBoardInEdit('');
+  };
+
+  const handleKeyDown = (callback: any) => (event: any) => {
+    if (event.key === 'Enter') {
+      callback(event);
+    }
+  };
+
   const onGenerateExampleBoard = async () => {
     setIsLoading(true);
     dispatch(generateExampleBoard())
@@ -178,10 +234,25 @@ const Home = () => {
       <List>
         {boards.map((board: any) => (
           <Row key={`row-${board.id}`}>
+            {boardInEdit !== board.id ? (
+              <>
             <StyledLink to={`board/${board.id}`}>{board.title}</StyledLink>
+            <ButtonWrapper>
             <StyledDeleteBoardButton onClick={handleDeleteBoard(board.id)}>
               <FaTimesCircle size={18} />
             </StyledDeleteBoardButton>
+            <EditCardButton onClick={(e: any) => openBoardEditor(e, board)} />
+            </ButtonWrapper>
+            </>) : (
+              <TextareaWrapper >
+                <BoardTextarea
+                  value={tempBoardTitle}
+                  onChange={handleBoardEditorChange}
+                  onKeyDown={handleKeyDown(handleBoardEdit)}
+                  onBlur={handleBoardEdit}
+                />
+              </TextareaWrapper>)}
+
           </Row>
         ))}
         <StyledForm onSubmit={handleAddBoard(newBoardTitle)}>
