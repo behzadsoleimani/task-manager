@@ -1,5 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit'
-import { getRandomEmoji } from '../helpers'
+import { generateExampleCards, getRandomEmoji } from '../helpers'
 import { IBoard, ICard, IList } from '../types/global-types'
 
 
@@ -24,8 +24,42 @@ export const boardSlice = createSlice({
     },
     generateExampleBoard: (state) => {
       const title = `Example Board ${getRandomEmoji()}`;
-      localStorage.setItem("boards", JSON.stringify([...state, { id: `${new Date().getTime()}`, title }]))
-      return [...state, { id: `${new Date().getTime()}`, title }]
+      const exampleCards = generateExampleCards();
+      localStorage.setItem("boards", JSON.stringify([...state, { id: `${new Date().getTime()}`, title , 
+      list: [
+        {
+          id: new Date().getTime().toString() + 1,
+          title: 'Todo',
+          cards: exampleCards[0]
+        },
+        {
+          id: new Date().getTime().toString() + 2,
+          title: 'In Progress',
+          cards: exampleCards[1]
+        },
+        {
+          id: new Date().getTime().toString() + 3,
+          title: 'Done',
+          cards: exampleCards[2]
+        }
+      ] }]))
+      return [...state, { id: `${new Date().getTime()}`, title, list: [
+        {
+          id: new Date().getTime().toString() + 1,
+          title: 'Todo',
+          cards: exampleCards[0]
+        },
+        {
+          id: new Date().getTime().toString() + 2,
+          title: 'In Progress',
+          cards: exampleCards[1]
+        },
+        {
+          id: new Date().getTime().toString() + 3,
+          title: 'Done',
+          cards: exampleCards[2]
+        }
+      ] }]
     },
     addList: (state, action) => {
 
